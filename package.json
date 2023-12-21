@@ -1,6 +1,6 @@
 {
   "name": "@stable-canvas/sd-webui-a1111-prompt-parser",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "source": "src/main.ts",
   "main": "dist/main.js",
@@ -31,6 +31,7 @@
     "watch": "tsup --watch",
     "dev": "pnpm watch",
     "start": "pnpm build",
+    "clean-gen-code": "ts-node ./scripts/clean_gen_code.ts",
     "prepack": "rm -rf dist && pnpm run build",
     "test": "jest"
   },

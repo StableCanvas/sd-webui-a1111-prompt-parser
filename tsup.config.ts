@@ -9,5 +9,6 @@ export default defineConfig((options) => {
     sourcemap: true,
     clean: true,
     minify: !options.watch,
+    globalName: "PromptParser",
   };
 });
