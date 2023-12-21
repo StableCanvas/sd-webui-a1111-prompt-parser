@@ -1,0 +1,60 @@
+{
+  "name": "@stable-canvas/sd-webui-a1111-prompt-parser",
+  "version": "1.0.0",
+  "description": "",
+  "source": "src/main.ts",
+  "main": "dist/main.js",
+  "module": "dist/main.mjs",
+  "unpkg": "dist/main.global.js",
+  "types": "dist/main.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/main.mjs",
+      "require": "./dist/main.js"
+    },
+    "./dist/main.global.js": "./dist/main.global.js"
+  },
+  "keywords": [
+    "stable diffusion",
+    "webui",
+    "diffusion",
+    "ai",
+    "ai art"
+  ],
+  "files": [
+    "dist/**.js*",
+    "dist/**.mjs*",
+    "dist/**.ts"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "dev": "pnpm watch",
+    "start": "pnpm build",
+    "prepack": "rm -rf dist && pnpm run build",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StableCanvas/sd-webui-a1111-client.git"
+  },
+  "author": "zhzluke96",
+  "bugs": {
+    "url": "https://github.com/StableCanvas/sd-webui-a1111-client/issues"
+  },
+  "homepage": "https://github.com/StableCanvas/sd-webui-a1111-client#readme",
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "rollup": "^2.79.1",
+    "rollup-plugin-dts": "^5.3.0",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.6.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.1.6"
+  }
+}
