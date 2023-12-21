@@ -138,6 +138,17 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
         },
       ];
     }
+    case "scheduled_none_to": {
+      if (!node.children) return [];
+      const [value, number] = node.children;
+      return [
+        {
+          type: "scheduled_to",
+          value: number.children?.[0].value!,
+          args: compilation(value),
+        },
+      ];
+    }
     case "scheduled_from": {
       if (!node.children) return [];
       const [value, number] = node.children;

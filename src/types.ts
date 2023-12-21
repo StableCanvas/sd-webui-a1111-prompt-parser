@@ -146,6 +146,7 @@ export namespace SDPromptParser {
     | "extra_networks_name"
     | "extra_networks_args"
     | "scheduled_to"
+    | "scheduled_none_to"
     | "scheduled_from"
     | "scheduled_full";
 }

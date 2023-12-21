@@ -14,22 +14,26 @@ extra_networks_args     : (":" EXTRA_NETWORKS_TEXT)+
          | scheduled
          | alternate
          | plain
+         | whitespace
 
 alternate  : "[" prompts ("|" prompts)+ "]"
 scheduled  : "[" prompts ":" prompts ":" number "]" -> scheduled_full
            | "[" prompts ":" ":" number "]"         -> scheduled_from
            | "[" prompts ":" number "]"             -> scheduled_to
+           | "[" ":" prompts ":" number "]"         -> scheduled_none_to
 emphasized : "(" prompts ")"                        -> emphasized_positive
            | "(" prompts ":" number ")"             -> emphasized_weighted
            | "[" prompts "]"                        -> emphasized_negative
 plain      : PLAIN_TEXT
 number     : NUMBER
+whitespace : WHITESPACE
 
 FLOAT  : INT | DECIMAL
 NUMBER : ["+"|"-"] (FLOAT | INT)
 
 EXTRA_NETWORKS_TEXT : /[^:>]+/
 PLAIN_TEXT          : /(\\.|[^\[\]\(\)<>:|,\s])+/
+WHITESPACE          : /\s+/
 
 %import common.INT
 %import common.DECIMAL
