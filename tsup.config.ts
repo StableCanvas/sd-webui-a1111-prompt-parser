@@ -10,5 +10,6 @@ export default defineConfig((options) => {
     clean: true,
     minify: !options.watch,
     globalName: "PromptParser",
+    keepNames: true,
   };
 });
