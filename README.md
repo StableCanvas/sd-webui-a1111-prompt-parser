@@ -34,7 +34,7 @@ pip install lark-js
 
 ### 1.2 build
 ```
-lark-js prompt_grammar.lark | sed 's/.*const util.*//' | sed 's/.*"strict": false.*//' | sed 's/.*"ordered_sets": true.*//' > src/prompt_parser.js
+pnpm build-lark
 ```
 
 > NOTE: two options values need to be cleared manually (`strict` & `ordered_sets`)

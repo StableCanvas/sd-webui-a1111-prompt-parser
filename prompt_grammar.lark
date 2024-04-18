@@ -32,7 +32,7 @@ FLOAT  : INT | DECIMAL
 NUMBER : ["+"|"-"] (FLOAT | INT)
 
 EXTRA_NETWORKS_TEXT : /[^:>]+/
-PLAIN_TEXT          : /(\\.|[^\[\]\(\)<>:|,\s])+/
+PLAIN_TEXT          : /(\\.|[^\[\]\(\)<>|,\s])+/
 WHITESPACE          : /\s+/
 
 %import common.INT

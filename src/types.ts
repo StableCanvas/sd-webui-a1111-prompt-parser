@@ -144,21 +144,24 @@ export namespace SDPromptParser {
   };
   export type PositiveNode = {
     type: "positive";
-    value: string;
-    // [depth number]
-    args: [number];
+    /**
+     * depth
+     */
+    value: number;
+    args: PromptNode[];
   };
   export type NegativeNode = {
     type: "negative";
-    value: string;
-    // [depth number]
-    args: [number];
+    /**
+     * depth
+     */
+    value: number;
+    args: PromptNode[];
   };
   export type WeightedNode = {
     type: "weighted";
-    value: string;
-    // [number]
-    args: [string];
+    value: number;
+    args: PromptNode[];
   };
   export type AlternateNode = {
     type: "alternate";
@@ -167,17 +170,17 @@ export namespace SDPromptParser {
   };
   export type ScheduledToNode = {
     type: "scheduled_to";
-    value: string;
+    value: number;
     args: PromptNode[];
   };
   export type ScheduledFromNode = {
     type: "scheduled_from";
-    value: string;
+    value: number;
     args: PromptNode[];
   };
   export type ScheduledFullNode = {
     type: "scheduled_full";
-    value: string;
+    value: number;
     // [from_prompt, to_prompt]
     args: [PromptNode[], PromptNode[]];
   };

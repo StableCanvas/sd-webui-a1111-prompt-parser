@@ -45,7 +45,10 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
         }
       }
       if (bufferNode) {
-        bufferNode.value = bufferNode.value.trim();
+        bufferNode.value =
+          typeof bufferNode.value === "string"
+            ? bufferNode.value.trim()
+            : bufferNode.value;
         buffer.push(bufferNode);
       }
       return buffer;
@@ -69,12 +72,12 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
         current = current.children?.[0];
         depth++;
       }
-      const value = compilation(current);
+      const nodes = compilation(current);
       return [
         {
           type: "positive",
-          value: value[0].value,
-          args: [depth],
+          value: depth,
+          args: nodes,
         },
       ];
     }
@@ -89,12 +92,12 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
         current = current.children?.[0];
         depth++;
       }
-      const value = compilation(current);
+      const nodes = compilation(current);
       return [
         {
           type: "negative",
-          value: value[0].value,
-          args: [depth],
+          value: depth,
+          args: nodes,
         },
       ];
       break;
@@ -110,12 +113,16 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       if (!number_value) {
         throw new Error("Invalid AST");
       }
+      const n = Number(number_value);
+      if (Number.isNaN(n)) {
+        throw new Error("Invalid AST");
+      }
 
       return [
         {
           type: "weighted",
-          value: combinationNodes[0].value,
-          args: [number_value],
+          value: n,
+          args: combinationNodes,
         },
       ];
     }
@@ -133,10 +140,14 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
     case "scheduled_to": {
       if (!node.children) return [];
       const [value, number] = node.children;
+      const n = Number(number.children?.[0].value);
+      if (Number.isNaN(n)) {
+        throw new Error("Invalid AST");
+      }
       return [
         {
           type: "scheduled_to",
-          value: number.children?.[0].value!,
+          value: n,
           args: compilation(value),
         },
       ];
@@ -144,10 +155,14 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
     case "scheduled_none_to": {
       if (!node.children) return [];
       const [value, number] = node.children;
+      const n = Number(number.children?.[0].value);
+      if (Number.isNaN(n)) {
+        throw new Error("Invalid AST");
+      }
       return [
         {
           type: "scheduled_to",
-          value: number.children?.[0].value!,
+          value: n,
           args: compilation(value),
         },
       ];
@@ -155,10 +170,14 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
     case "scheduled_from": {
       if (!node.children) return [];
       const [value, number] = node.children;
+      const n = Number(number.children?.[0].value);
+      if (Number.isNaN(n)) {
+        throw new Error("Invalid AST");
+      }
       return [
         {
           type: "scheduled_from",
-          value: number.children?.[0].value!,
+          value: n,
           args: compilation(value),
         },
       ];
@@ -166,10 +185,14 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
     case "scheduled_full": {
       if (!node.children) return [];
       const [from_value, to_value, number] = node.children;
+      const n = Number(number.children?.[0].value);
+      if (Number.isNaN(n)) {
+        throw new Error("Invalid AST");
+      }
       return [
         {
           type: "scheduled_full",
-          value: number.children?.[0].value!,
+          value: n,
           args: [compilation(from_value), compilation(to_value)],
         },
       ];

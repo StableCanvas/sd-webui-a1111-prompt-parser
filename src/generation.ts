@@ -7,28 +7,32 @@ const generation_node = (node: sdp.PromptNode): string => {
       return node.value;
     }
     case "positive": {
-      const [depth] = node.args;
+      const nodes = node.args;
+      const depth = node.value;
       // depth 2 => (( node.value ))
       // depth 3 => ((( node.value )))
-      let result = node.value;
+      let result = generation_token(nodes).join(", ");
       for (let i = 0; i < depth; i++) {
         result = `(${result})`;
       }
       return result;
     }
     case "negative": {
-      const [depth] = node.args;
+      const nodes = node.args;
+      const depth = node.value;
       // depth 2 => [[ node.value ]]
       // depth 3 => [[[ node.value ]]]
-      let result = node.value;
+      let result = generation_token(nodes).join(", ");
       for (let i = 0; i < depth; i++) {
         result = `[${result}]`;
       }
       return result;
     }
     case "weighted": {
-      const [n] = node.args;
-      return `(${node.value}:${n})`;
+      const n = node.value;
+      const prompts = node.args;
+      const prompt = generation_token(prompts).join(", ");
+      return `(${prompt}:${n})`;
     }
     case "alternate": {
       if (!node.args || !Array.isArray(node.args)) {
