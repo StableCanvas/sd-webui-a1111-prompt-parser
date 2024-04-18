@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Env Test</title>
+  </head>
+  <body>
+    <div id="root">
+      <h1>Web Env Test</h1>
+      <pre></pre>
+    </div>
+    <script type="module">
+      import { PromptParser } from "../dist/main.mjs";
+      const parser = new PromptParser();
+
+      const prompt1 = `masterpiece, 1girl, blonde hair, <lora:Zelda_v1:0.5>, (chromatic aberration:0.7), sharp focus, hyper detailed, (fog:0.7), <hypernet:sxz-bloom:0.5>, [real photo], [highlight:dark:0.9], (((good anatomy)))`;
+
+      const result = parser.parse(prompt1);
+      document.querySelector("pre").textContent = JSON.stringify(
+        result,
+        null,
+        2
+      );
+    </script>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+import "./fakeInspect";
 export * from "./PromptParser";
 export * from "./types";
 export * from "./compilation";

@@ -1,8 +1,8 @@
 start : (extra_networks_prompts | prompts)*
 
 ?extra_networks_prompts : extra_networks
-                        | extra_networks_prompts (extra_networks)+
-                        | extra_networks_prompts ("," [extra_networks_prompts])
+                        | extra_networks_prompts (extra_networks)+               -> combination
+                        | extra_networks_prompts ("," [extra_networks_prompts]) -> multiple
 extra_networks          : "<" extra_networks_name extra_networks_args ">"
 extra_networks_name     : EXTRA_NETWORKS_TEXT
 extra_networks_args     : (":" EXTRA_NETWORKS_TEXT)+
