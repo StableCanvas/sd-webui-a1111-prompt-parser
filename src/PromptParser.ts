@@ -1,4 +1,4 @@
-import { compilation } from "./compilation.js";
+import { compilation } from "./compilation";
 import * as PP from "./prompt_parser.js";
 import { SDPromptParser as sdp } from "./types";
 

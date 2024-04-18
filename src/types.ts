@@ -126,11 +126,83 @@ export namespace SDPromptParser {
     _meta?: any;
   }
 
-  export interface IPromptNode {
-    type: string;
+  export type PromptNodeType =
+    | "plain"
+    | "positive"
+    | "negative"
+    | "weighted"
+    | "alternate"
+    | "scheduled_to"
+    | "scheduled_from"
+    | "scheduled_full"
+    | "extra_networks_name"
+    | "extra_networks";
+
+  export type PlainNode = {
+    type: "plain";
     value: string;
-    args?: any;
-  }
+  };
+  export type PositiveNode = {
+    type: "positive";
+    value: string;
+    // [depth number]
+    args: [number];
+  };
+  export type NegativeNode = {
+    type: "negative";
+    value: string;
+    // [depth number]
+    args: [number];
+  };
+  export type WeightedNode = {
+    type: "weighted";
+    value: string;
+    // [number]
+    args: [string];
+  };
+  export type AlternateNode = {
+    type: "alternate";
+    value: string;
+    args: PromptNode[];
+  };
+  export type ScheduledToNode = {
+    type: "scheduled_to";
+    value: string;
+    args: PromptNode[];
+  };
+  export type ScheduledFromNode = {
+    type: "scheduled_from";
+    value: string;
+    args: PromptNode[];
+  };
+  export type ScheduledFullNode = {
+    type: "scheduled_full";
+    value: string;
+    // [from_prompt, to_prompt]
+    args: [PromptNode[], PromptNode[]];
+  };
+  export type ExtraNetworksNameNode = {
+    type: "extra_networks_name";
+    value: string;
+  };
+  export type ExtraNetworksNode = {
+    type: "extra_networks";
+    value: string;
+    args: string[];
+  };
+
+  // TreeNode but Array Only...
+  export type PromptNode =
+    | PlainNode
+    | PositiveNode
+    | NegativeNode
+    | WeightedNode
+    | AlternateNode
+    | ScheduledToNode
+    | ScheduledFromNode
+    | ScheduledFullNode
+    | ExtraNetworksNameNode
+    | ExtraNetworksNode;
 
   export type TreeData =
     | "start"

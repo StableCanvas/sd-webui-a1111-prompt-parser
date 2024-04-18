@@ -1,9 +1,9 @@
 import { SDPromptParser as sdp } from "./types";
 
-export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
+export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
   switch (node.data as sdp.TreeData) {
     case "start": {
-      return node.children?.map(compilation).flat() as sdp.IPromptNode[];
+      return node.children?.map(compilation).flat() as sdp.PromptNode[];
     }
     case "multiple": {
       if (!node.children) return [];
@@ -14,24 +14,24 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
               child.children
                 ?.filter((c) => c.type === "PLAIN_TEXT")
                 .map((c) => ({
-                  type: "token",
+                  type: "plain",
                   value: c.value!,
                 })) || []
             );
           }
           return compilation(child);
         })
-        .flat() as sdp.IPromptNode[];
+        .flat() as sdp.PromptNode[];
     }
     case "combination": {
       if (!node.children) return [];
-      const buffer = [] as sdp.IPromptNode[];
-      let bufferNode = null as null | sdp.IPromptNode;
+      const buffer = [] as sdp.PromptNode[];
+      let bufferNode = null as null | sdp.PromptNode;
       for (const child of node.children) {
         if (child.data === "plain") {
           if (!bufferNode) {
             bufferNode = {
-              type: "token",
+              type: "plain" as const,
               value: "",
             };
           }
@@ -53,7 +53,7 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
     case "plain": {
       return [
         {
-          type: "token",
+          type: "plain",
           value: node.children?.[0].value!,
         },
       ];
@@ -107,12 +107,15 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
       }
       const combinationNodes = compilation(combination);
       const number_value = number.children?.[0].value;
+      if (!number_value) {
+        throw new Error("Invalid AST");
+      }
 
       return [
         {
           type: "weighted",
           value: combinationNodes[0].value,
-          args: number_value,
+          args: [number_value],
         },
       ];
     }
@@ -165,19 +168,16 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
       const [from_value, to_value, number] = node.children;
       return [
         {
-          type: "scheduled_from",
+          type: "scheduled_full",
           value: number.children?.[0].value!,
-          args: {
-            from: compilation(from_value),
-            to: compilation(to_value),
-          },
+          args: [compilation(from_value), compilation(to_value)],
         },
       ];
     }
     case "extra_networks_name": {
       return [
         {
-          type: "extra_networks_name",
+          type: "extra_networks_name" as const,
           value: node.children?.[0].value!,
         },
       ];
@@ -189,10 +189,16 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.IPromptNode[] => {
         throw new Error("Invalid AST");
       }
       const nameValue = name.children?.[0].value!;
-      const argsValue = args.children?.map((c) => c.value);
+      const argsValue = args.children?.map((c) => c.value!) || [];
+      if (!argsValue.length) {
+        throw new Error("Invalid AST");
+      }
+      if (!nameValue) {
+        throw new Error("Invalid AST");
+      }
       return [
         {
-          type: "extra_networks",
+          type: "extra_networks" as const,
           value: nameValue,
           args: argsValue,
         },
