@@ -31,7 +31,6 @@
     "watch": "tsup --watch",
     "dev": "pnpm watch",
     "start": "pnpm build",
-    "clean-gen-code": "ts-node ./scripts/clean_gen_code.ts",
     "prepack": "rm -rf dist && pnpm run build",
     "test": "jest",
     "build-lark": "lark-js prompt_grammar.lark | sed 's/.*const util.*//' | sed 's/.*\"strict\": false.*//' | sed 's/.*\"ordered_sets\": true.*//' > src/prompt_parser.js"
