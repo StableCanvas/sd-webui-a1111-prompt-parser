@@ -1,5 +1,12 @@
 import { SDPromptParser as sdp } from "./types";
 
+/**
+ * Compiles an SDPromptParser AST into an array of PromptNodes.
+ *
+ * @param {sdp.IPromptASTNode} node - The root node of the AST.
+ * @return {sdp.PromptNode[]} An array of PromptNodes representing the compiled AST.
+ * @throws {Error} If the AST is invalid or contains unexpected data.
+ */
 export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
   switch (node.data as sdp.TreeData) {
     case "start": {

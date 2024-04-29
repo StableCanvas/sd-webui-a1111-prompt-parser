@@ -1,5 +1,11 @@
 import { SDPromptParser as sdp } from "./types";
 
+/**
+ * Generates a string representation of a prompt node.
+ *
+ * @param {sdp.PromptNode} node - The prompt node to generate the string representation for.
+ * @return {string} The string representation of the prompt node.
+ */
 const generation_node = (node: sdp.PromptNode): string => {
   switch (node.type) {
     case "extra_networks_name":
@@ -93,10 +99,22 @@ const generation_node = (node: sdp.PromptNode): string => {
   }
 };
 
+/**
+ * Generates tokens for prompt nodes.
+ *
+ * @param {sdp.PromptNode[]} nodes - The prompt nodes to generate tokens for.
+ * @return {string[]} The generated tokens.
+ */
 export const generation_token = (nodes: sdp.PromptNode[]): string[] => {
   return nodes.map(generation_node);
 };
 
+/**
+ * Generates a string representation of prompt nodes.
+ *
+ * @param {sdp.PromptNode[]} nodes - The prompt nodes to generate the string representation for.
+ * @return {string} The generated string representation.
+ */
 export const generation_str = (nodes: sdp.PromptNode[]): string => {
   return generation_token(nodes).join(", ");
 };

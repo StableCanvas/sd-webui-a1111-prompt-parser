@@ -11,12 +11,31 @@ interface ParseOptions {
   force?: boolean;
 }
 
+/**
+ * A parser for parsing prompt text (StableDiffusion Prompt) into a list of tokens.
+ *
+ * @example
+ * ```ts
+ * const parser = new PromptParser();
+ * const tokens = parser.parse("masterpiece, 1girl, blonde hair");
+ * console.log(tokens);
+ * ```
+ */
 export class PromptParser {
   _parser: any;
   constructor(options?: sdp.ILarkOptions) {
     this._parser = PP.get_parser(options);
   }
 
+  /**
+   * Parses the given text into a prompt abstract syntax tree (AST) node.
+   *
+   * @param {string} text - The text to be parsed.
+   * @param {ParseOptions} [options] - Optional parsing options.
+   * @param {boolean} [options.force] - Whether to force parsing even if an error occurs.
+   * @returns {sdp.IPromptASTNode} The parsed AST node.
+   * @throws {Error} If parsing fails and the `force` option is not enabled.
+   */
   parseAST(text: string, options?: ParseOptions): sdp.IPromptASTNode {
     try {
       return this._parser.parse(text) as sdp.IPromptASTNode;
@@ -31,6 +50,13 @@ export class PromptParser {
     }
   }
 
+  /**
+   * Parses the given text using the provided options.
+   *
+   * @param {string} text - The text to be parsed.
+   * @param {ParseOptions} [options] - Optional parsing options.
+   * @return {sdp.PromptNode[]}  The parsed prompt nodes.
+   */
   parse(text: string, options?: ParseOptions) {
     const root = this.parseAST(text, options);
     return compilation(root);
