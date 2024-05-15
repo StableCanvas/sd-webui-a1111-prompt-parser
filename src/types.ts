@@ -223,5 +223,6 @@ export namespace SDPromptParser {
     | "scheduled_to"
     | "scheduled_none_to"
     | "scheduled_from"
-    | "scheduled_full";
+    | "scheduled_full"
+    | "rating_prompt";
 }

@@ -234,6 +234,33 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
         },
       ];
     }
+    /**
+     * case:
+     * ```
+     * 1girl, rating:safe
+     * ```
+     */
+    case "rating_prompt": {
+      if (!node.children) return [];
+      const [head, tail] = node.children;
+      if (!tail || !head) {
+        throw new Error("Invalid AST");
+      }
+      const head_nodes = compilation(head);
+      const tail_nodes = compilation(tail);
+      if (head_nodes.length !== 1 || tail_nodes.length !== 1) {
+        throw new Error("Invalid AST");
+      }
+      if (head_nodes[0].type !== "plain" || tail_nodes[0].type !== "plain") {
+        throw new Error("Invalid AST");
+      }
+      return [
+        {
+          type: "plain",
+          value: `${head_nodes[0].value}:${tail_nodes[0].value}`,
+        },
+      ];
+    }
     default: {
       throw new Error(`Invalid AST: ${node.data} ${node.type || ""}`);
     }

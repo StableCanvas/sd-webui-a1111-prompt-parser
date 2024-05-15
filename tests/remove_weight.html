@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo - Remove Weight</title>
+    <style>
+      body {
+        color: white;
+        background-color: rgba(66, 66, 66);
+      }
+      pre {
+        max-width: 100%;
+        padding: 16px;
+        background-color: rgba(255, 255, 255, 0.1);
+        word-break: break-all;
+        white-space: normal;
+      }
+      textarea {
+        min-width: 512px;
+        min-height: 128px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <h1>Demo - Remove Weight</h1>
+      <h3>input_prompt:</h3>
+      <textarea type="text"></textarea>
+      <h3>removed_text:</h3>
+      <pre></pre>
+    </div>
+    <script type="module">
+      import { PromptParser, generation_str } from "../dist/main.mjs";
+      const parser = new PromptParser();
+
+      const $textarea = document.querySelector("textarea");
+      const $pre = document.querySelector("pre");
+
+      $textarea.addEventListener("change", () => {
+        const text = $textarea.value.trim();
+
+        const result = parser.parse(text);
+        console.log(result);
+
+        const removed_w = result.map((x) => {
+          switch (x.type) {
+            case "positive": {
+              x.value = 1;
+              break;
+            }
+            case "negative": {
+              x.value = -1;
+              break;
+            }
+            case "weighted": {
+              x.value = 1;
+              break;
+            }
+          }
+          return x;
+        });
+
+        const removed_text = generation_str(removed_w);
+        console.log(removed_text);
+
+        $pre.innerHTML = removed_text;
+      });
+    </script>
+  </body>
+</html>
