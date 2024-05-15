@@ -28,6 +28,7 @@
       <h3>input_prompt:</h3>
       <textarea type="text"></textarea>
       <h3>removed_text:</h3>
+      <button>copy</button>
       <pre></pre>
     </div>
     <script type="module">
@@ -36,21 +37,18 @@
 
       const $textarea = document.querySelector("textarea");
       const $pre = document.querySelector("pre");
+      const $button = document.querySelector("button");
 
-      $textarea.addEventListener("change", () => {
-        const text = $textarea.value.trim();
-
+      const remove_w_text = (text) => {
         const result = parser.parse(text);
-        console.log(result);
-
         const removed_w = result.map((x) => {
           switch (x.type) {
             case "positive": {
-              x.value = 1;
+              x.value = 0;
               break;
             }
             case "negative": {
-              x.value = -1;
+              x.value = 0;
               break;
             }
             case "weighted": {
@@ -60,11 +58,31 @@
           }
           return x;
         });
-
         const removed_text = generation_str(removed_w);
-        console.log(removed_text);
+        return removed_text;
+      };
 
-        $pre.innerHTML = removed_text;
+      $button.addEventListener("click", () => {
+        const text = $pre.innerText;
+        navigator.clipboard.writeText(text);
+
+        $button.innerText = "copied!";
+        setTimeout(() => {
+          $button.innerText = "copy";
+        }, 1000);
+      });
+
+      $textarea.addEventListener("change", () => {
+        let text = $textarea.value.trim();
+
+        // pass 3 times
+        text = remove_w_text(text);
+        text = remove_w_text(text);
+        text = remove_w_text(text);
+
+        console.log(text);
+
+        $pre.innerText = text;
       });
     </script>
   </body>
