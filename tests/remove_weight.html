@@ -41,23 +41,29 @@
 
       const remove_w_text = (text) => {
         const result = parser.parse(text);
-        const removed_w = result.map((x) => {
-          switch (x.type) {
-            case "positive": {
-              x.value = 0;
-              break;
+        const removed_w = result
+          .map((x) => {
+            switch (x.type) {
+              case "positive": {
+                x.value = 0;
+                break;
+              }
+              case "negative": {
+                x.value = 0;
+                break;
+              }
+              case "weighted": {
+                x.value = 1;
+                break;
+              }
+              // remove lora
+              case "extra_networks": {
+                return null;
+              }
             }
-            case "negative": {
-              x.value = 0;
-              break;
-            }
-            case "weighted": {
-              x.value = 1;
-              break;
-            }
-          }
-          return x;
-        });
+            return x;
+          })
+          .filter((x) => x !== null);
         const removed_text = generation_str(removed_w);
         return removed_text;
       };
