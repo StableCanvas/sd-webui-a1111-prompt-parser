@@ -1,12 +1,20 @@
 import { SDPromptParser as sdp } from "./types";
 
+interface GenerationOptions {
+  remove_1_weighted?: boolean;
+}
+
 /**
- * Generates a string representation of a prompt node.
+ * Generates a string representation based on the type of the prompt node.
  *
  * @param {sdp.PromptNode} node - The prompt node to generate the string representation for.
- * @return {string} The string representation of the prompt node.
+ * @param {GenerationOptions} [options] - Optional generation options.
+ * @return {string} The generated string representation.
  */
-const generation_node = (node: sdp.PromptNode): string => {
+const generation_node = (
+  node: sdp.PromptNode,
+  options?: GenerationOptions
+): string => {
   switch (node.type) {
     case "extra_networks_name":
     case "plain": {
@@ -38,6 +46,11 @@ const generation_node = (node: sdp.PromptNode): string => {
       const n = node.value;
       const prompts = node.args;
       const prompt = generation_token(prompts).join(", ");
+      if (options?.remove_1_weighted) {
+        if (n === 1) {
+          return prompt;
+        }
+      }
       return `(${prompt}:${n})`;
     }
     case "alternate": {
@@ -103,18 +116,26 @@ const generation_node = (node: sdp.PromptNode): string => {
  * Generates tokens for prompt nodes.
  *
  * @param {sdp.PromptNode[]} nodes - The prompt nodes to generate tokens for.
+ * @param {GenerationOptions} [options] - Optional generation options.
  * @return {string[]} The generated tokens.
  */
-export const generation_token = (nodes: sdp.PromptNode[]): string[] => {
-  return nodes.map(generation_node);
+export const generation_token = (
+  nodes: sdp.PromptNode[],
+  options?: GenerationOptions
+): string[] => {
+  return nodes.map((node) => generation_node(node, options));
 };
 
 /**
- * Generates a string representation of prompt nodes.
+ * Generates a string representation based on the prompt nodes.
  *
  * @param {sdp.PromptNode[]} nodes - The prompt nodes to generate the string representation for.
+ * @param {GenerationOptions} [options] - Optional generation options.
  * @return {string} The generated string representation.
  */
-export const generation_str = (nodes: sdp.PromptNode[]): string => {
-  return generation_token(nodes).join(", ");
+export const generation_str = (
+  nodes: sdp.PromptNode[],
+  options?: GenerationOptions
+): string => {
+  return generation_token(nodes, options).join(", ");
 };

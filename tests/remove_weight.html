@@ -64,7 +64,9 @@
             return x;
           })
           .filter((x) => x !== null);
-        const removed_text = generation_str(removed_w);
+        const removed_text = generation_str(removed_w, {
+          remove_1_weighted: true,
+        });
         return removed_text;
       };
 
