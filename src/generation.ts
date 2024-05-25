@@ -1,6 +1,9 @@
 import { SDPromptParser as sdp } from "./types";
 
 interface GenerationOptions {
+  /**
+   * When set to true, nodes with a weight of 1 are removed. The default is false.
+   */
   remove_1_weighted?: boolean;
 }
 

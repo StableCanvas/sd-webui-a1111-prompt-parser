@@ -1,6 +1,6 @@
 {
   "name": "@stable-canvas/sd-webui-a1111-prompt-parser",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "",
   "source": "src/main.ts",
   "main": "dist/main.js",
