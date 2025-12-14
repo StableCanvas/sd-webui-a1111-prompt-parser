@@ -7,13 +7,13 @@ sd-webui-a1111-prompt-parser is a Stable Diffusion webUI (A1111) prompt parser f
 ## Features
 
 - Parses A1111 format prompts, supporting the following syntax:
-    - Plain text
-    - Emphasis (parentheses)
-    - Weight (brackets)
-    - Lora models
-    - Hypernetwork models
-    - Negative prompts (square brackets)
-    - Step Control (scheduling)
+  - Plain text
+  - Emphasis (parentheses)
+  - Weight (brackets)
+  - Lora models
+  - Hypernetwork models
+  - Negative prompts (square brackets)
+  - Step Control (scheduling)
 - Converts parsed results into JavaScript objects for easy manipulation and use
 - Supports regenerating A1111 format prompts from JavaScript objects
 
@@ -45,15 +45,76 @@ Output:
   { "type": "plain", "value": "1girl" },
   { "type": "plain", "value": "blonde hair" },
   { "type": "extra_networks", "value": "lora", "args": ["Zelda_v1", "0.5"] },
-  { "type": "weighted", "value": 0.7, "args": [{ "type": "plain", "value": "chromatic aberration" }] },
+  {
+    "type": "weighted",
+    "value": 0.7,
+    "args": [{ "type": "plain", "value": "chromatic aberration" }]
+  },
   { "type": "plain", "value": "sharp focus" },
   { "type": "plain", "value": "hyper detailed" },
-  { "type": "weighted", "value": 0.7, "args": [{ "type": "plain", "value": "fog" }] },
-  { "type": "extra_networks", "value": "hypernet", "args": ["sxz-bloom", "0.5"] },
-  { "type": "negative", "value": 1, "args": [{ "type": "plain", "value": "real photo" }] },
-  { "type": "scheduled_full", "value": 0.9, "args": [[{ "type": "plain", "value": "highlight" }], [{ "type": "plain", "value": "dark" }]] },
-  { "type": "positive", "value": 3, "args": [{ "type": "plain", "value": "good anatomy" }] }
+  {
+    "type": "weighted",
+    "value": 0.7,
+    "args": [{ "type": "plain", "value": "fog" }]
+  },
+  {
+    "type": "extra_networks",
+    "value": "hypernet",
+    "args": ["sxz-bloom", "0.5"]
+  },
+  {
+    "type": "negative",
+    "value": 1,
+    "args": [{ "type": "plain", "value": "real photo" }]
+  },
+  {
+    "type": "scheduled_full",
+    "value": 0.9,
+    "args": [
+      [{ "type": "plain", "value": "highlight" }],
+      [{ "type": "plain", "value": "dark" }]
+    ]
+  },
+  {
+    "type": "positive",
+    "value": 3,
+    "args": [{ "type": "plain", "value": "good anatomy" }]
+  }
 ]
+```
+
+### Usage Case: de-SD-styled (remove stable-diffusion styled prompt)
+
+This function is used to clear all SD-WebUI style prompts, which is necessary when training new models based on DiT.
+
+> Theoretically, it should iterate through the tokens (this is a high level AST structure), but generally, no one writes prompt control syntax beyond two levels.
+
+```typescript
+import {
+  PromptParser,
+  generation_str,
+} from "@stable-canvas/sd-webui-a1111-prompt-parser";
+
+const parser = new PromptParser();
+
+function cleanPrompt(prompt: string): string {
+  const tokens = parser
+    .parse(prompt)
+    .filter((x) => x.type !== "extra_networks")
+    .flatMap((x) => {
+      switch (x.type) {
+        case "weighted":
+        case "negative":
+        case "positive":
+        case "scheduled_full":
+          return x.args;
+        default:
+          return x;
+      }
+    });
+
+  return generation_str(tokens).trim();
+}
 ```
 
 ## API
@@ -76,7 +137,7 @@ parse(text: string, options?: ParseOptions): SDPromptParser.PromptNode[];
 
 - `text`: The prompt string to be parsed.
 - `options`: Optional parameters for configuring parsing behavior.
-    - `force`: When set to `true`, parsing is forced even if there are syntax errors in the prompt. The parsing results may be incomplete. The default is `false`.
+  - `force`: When set to `true`, parsing is forced even if there are syntax errors in the prompt. The parsing results may be incomplete. The default is `false`.
 - Returns: An array of parsed prompt nodes, node type definitions refer to `SDPromptParser.PromptNode`.
 
 ### `compilation` Function
@@ -96,7 +157,7 @@ generation_token(nodes: SDPromptParser.PromptNode[], options?: GenerationOptions
 
 - `nodes`: An array of nodes for which to generate prompt strings.
 - `options`: Optional parameters for configuring generation behavior.
-    - `remove_1_weighted`: When set to `true`, nodes with a weight of 1 are removed. The default is `false`.
+  - `remove_1_weighted`: When set to `true`, nodes with a weight of 1 are removed. The default is `false`.
 - Returns: An array of generated prompt strings.
 
 ### `generation_str` Function
@@ -107,7 +168,7 @@ generation_str(nodes: SDPromptParser.PromptNode[], options?: GenerationOptions):
 
 - `nodes`: An array of nodes for which to generate the prompt string.
 - `options`: Optional parameters for configuring generation behavior.
-    - `remove_1_weighted`: When set to `true`, nodes with a weight of 1 are removed. The default is `false`.
+  - `remove_1_weighted`: When set to `true`, nodes with a weight of 1 are removed. The default is `false`.
 - Returns: The generated prompt string.
 
 ## Build

@@ -1,3 +1,8 @@
+import {
+  InvalidPromptNodeStructureError,
+  InvalidPromptNodeValueError,
+  UnknownPromptNodeTypeError,
+} from "./errors";
 import { SDPromptParser as sdp } from "./types";
 
 interface GenerationOptions {
@@ -58,7 +63,10 @@ const generation_node = (
     }
     case "alternate": {
       if (!node.args || !Array.isArray(node.args)) {
-        throw new Error("Invalid AST, missing args for alternate node");
+        throw new InvalidPromptNodeStructureError(
+          "Missing args for alternate node",
+          node
+        );
       }
       // "[" prompts ("|" prompts)+ "]"
       const result = node.args.map((x) => generation_token([x])).join(" | ");
@@ -68,11 +76,18 @@ const generation_node = (
       // "[" prompts ":" number "]"
       const number = node.value;
       if (typeof number !== "number") {
-        throw new Error("Invalid AST, missing number for scheduled_to node");
+        throw new InvalidPromptNodeValueError(
+          "Missing number for scheduled_to node",
+          node.value,
+          node
+        );
       }
       const prompts = node.args;
       if (!Array.isArray(prompts)) {
-        throw new Error("Invalid AST, missing args for scheduled_to node");
+        throw new InvalidPromptNodeStructureError(
+          "Missing args for scheduled_to node",
+          node
+        );
       }
       const result = generation_token(prompts).join(", ");
       return `[${result}:${number}]`;
@@ -81,11 +96,18 @@ const generation_node = (
       // "[" prompts ":" ":" number "]"
       const number = node.value;
       if (Number.isNaN(number)) {
-        throw new Error("Invalid AST, missing number for scheduled_from node");
+        throw new InvalidPromptNodeValueError(
+          "Number is NaN for scheduled_from node",
+          node.value,
+          node
+        );
       }
       const prompts = node.args;
       if (!Array.isArray(prompts)) {
-        throw new Error("Invalid AST, missing args for scheduled_from node");
+        throw new InvalidPromptNodeStructureError(
+          "Missing args for scheduled_from node",
+          node
+        );
       }
       const result = generation_token(prompts).join(", ");
       return `[${result}::${number}]`;
@@ -94,7 +116,11 @@ const generation_node = (
       // "[" prompts ":" prompts ":" number "]"
       const number = node.value;
       if (Number.isNaN(number)) {
-        throw new Error("Invalid AST, missing number for scheduled_full node");
+        throw new InvalidPromptNodeValueError(
+          "Number is NaN for scheduled_full node",
+          node.value,
+          node
+        );
       }
       const [from, to] = node.args;
       return `[${generation_str(from)}:${generation_str(to)}:${number}]`;
@@ -104,13 +130,16 @@ const generation_node = (
       const type = node.value;
       const args = node.args;
       if (!Array.isArray(args)) {
-        throw new Error("Invalid AST, missing args for extra_networks node");
+        throw new InvalidPromptNodeStructureError(
+          "Missing args for extra_networks node",
+          node
+        );
       }
       const result = args.join(":");
       return `<${type}:${result}>`;
     }
     default: {
-      throw new Error(`Unknown node type: ${(node as any).type}`);
+      throw new UnknownPromptNodeTypeError((node as any)?.type ?? "none", node);
     }
   }
 };

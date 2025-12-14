@@ -1,3 +1,8 @@
+import {
+  InvalidASTStructureError,
+  InvalidASTValueError,
+  UnknownASTNodeError,
+} from "./errors";
 import { SDPromptParser as sdp } from "./types";
 
 /**
@@ -74,7 +79,10 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       let depth = 0;
       while (current.data === "emphasized_positive") {
         if (!current.children?.[0]) {
-          throw new Error("Invalid AST");
+          throw new InvalidASTStructureError(
+            "Missing children for emphasized_positive",
+            current
+          );
         }
         current = current.children?.[0];
         depth++;
@@ -94,7 +102,10 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       let depth = 0;
       while (current.data === "emphasized_negative") {
         if (!current.children?.[0]) {
-          throw new Error("Invalid AST");
+          throw new InvalidASTStructureError(
+            "Missing children for emphasized_negative",
+            current
+          );
         }
         current = current.children?.[0];
         depth++;
@@ -113,16 +124,23 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       if (!node.children) return [];
       const [combination, number] = node.children;
       if (!combination || !number) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTStructureError(
+          "emphasized_weighted requires combination and number nodes",
+          node
+        );
       }
       const combinationNodes = compilation(combination);
       const number_value = number.children?.[0].value;
       if (!number_value) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError(
+          "Missing number value in emphasized_weighted",
+          undefined,
+          number
+        );
       }
       const n = Number(number_value);
       if (Number.isNaN(n)) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError("Weight is NaN", number_value, number);
       }
 
       return [
@@ -149,7 +167,11 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       const [value, number] = node.children;
       const n = Number(number.children?.[0].value);
       if (Number.isNaN(n)) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError(
+          "Step count is NaN",
+          number.children?.[0].value,
+          number
+        );
       }
       return [
         {
@@ -164,7 +186,11 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       const [value, number] = node.children;
       const n = Number(number.children?.[0].value);
       if (Number.isNaN(n)) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError(
+          "Step count is NaN",
+          number.children?.[0].value,
+          number
+        );
       }
       return [
         {
@@ -179,7 +205,11 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       const [value, number] = node.children;
       const n = Number(number.children?.[0].value);
       if (Number.isNaN(n)) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError(
+          "Step count is NaN",
+          number.children?.[0].value,
+          number
+        );
       }
       return [
         {
@@ -194,7 +224,11 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       const [from_value, to_value, number] = node.children;
       const n = Number(number.children?.[0].value);
       if (Number.isNaN(n)) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError(
+          "Step count is NaN",
+          number.children?.[0].value,
+          number
+        );
       }
       return [
         {
@@ -216,15 +250,25 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       if (!node.children) return [];
       const [name, args] = node.children;
       if (!name || !args) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTStructureError(
+          "extra_networks requires name and args nodes",
+          node
+        );
       }
       const nameValue = name.children?.[0].value!;
       const argsValue = args.children?.map((c) => c.value!) || [];
       if (!argsValue.length) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTStructureError(
+          "extra_networks args cannot be empty",
+          args
+        );
       }
       if (!nameValue) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTValueError(
+          "extra_networks name cannot be empty",
+          nameValue,
+          name
+        );
       }
       return [
         {
@@ -244,15 +288,24 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       if (!node.children) return [];
       const [head, tail] = node.children;
       if (!tail || !head) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTStructureError(
+          "rating_prompt requires head and tail nodes",
+          node
+        );
       }
       const head_nodes = compilation(head);
       const tail_nodes = compilation(tail);
       if (head_nodes.length !== 1 || tail_nodes.length !== 1) {
-        throw new Error("Invalid AST");
+        throw new InvalidASTStructureError(
+          "rating_prompt parts must compile to exactly one node",
+          node
+        );
       }
       if (head_nodes[0].type !== "plain" || tail_nodes[0].type !== "plain") {
-        throw new Error("Invalid AST");
+        throw new InvalidASTStructureError(
+          "rating_prompt parts must be plain text",
+          node
+        );
       }
       return [
         {
@@ -262,7 +315,7 @@ export const compilation = (node: sdp.IPromptASTNode): sdp.PromptNode[] => {
       ];
     }
     default: {
-      throw new Error(`Invalid AST: ${node.data} ${node.type || ""}`);
+      throw new UnknownASTNodeError(node.data ?? "none", node);
     }
   }
 };
